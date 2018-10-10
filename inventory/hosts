@@ -1,0 +1,8 @@
+[master]
+172.30.20.104 ansible_ssh_user=root ansible_ssh_pass=1 NODE_NAME=master-104 IP=172.30.20.104 TYPE=master
+
+
+[node]
+172.30.20.113 ansible_ssh_user=root ansible_ssh_pass=1 NODE_NAME=node-113 IP=172.30.20.113 TYPE=node
+172.30.20.115 ansible_ssh_user=root ansible_ssh_pass=1 NODE_NAME=node-115 IP=172.30.20.115 TYPE=node
+

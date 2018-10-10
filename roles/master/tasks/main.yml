@@ -1,0 +1,38 @@
+- name: install docker
+  yum: name=docker state=present  
+
+- name: enable docker start
+  service: name=docker state=started enabled=true
+
+- name: install kubelet
+  yum: name=kubelet-{{KUBERNETES_VERSION}} state=present
+
+- name: install kubeadm
+  yum: name=kubeadm-{{KUBERNETES_VERSION}} state=present
+
+- name: custom kubelet config
+  template: src=10-kubeadm.conf dest=/etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+
+- name: enable kubelet
+  service: name=kubelet enabled=true
+
+- name: init master config
+  template: src=kubeadm.conf dest=/home/kubeadm.conf
+
+- name: install master
+  shell: kubeadm init --config /home/kubeadm.conf
+
+- name: create ~/.kube dir
+  file: path=~/.kube state=directory
+
+- name: configure kubectl config
+  shell: cp /etc/kubernetes/admin.conf ~/.kube/config
+
+- name: fetch admin.conf
+  fetch: src=/etc/kubernetes/admin.conf dest={{ADMIN_CONF}} flat=yes
+
+- name: init flannel conf
+  template: src=kube-flannel.yaml dest=/etc/kubernetes/kube-flannel.yaml
+
+- name: create flannel network
+  shell: kubectl create -f /etc/kubernetes/kube-flannel.yaml

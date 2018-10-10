@@ -1,0 +1,26 @@
+- name: set hostname
+  hostname: name={{NODE_NAME}}
+
+- name: set ip configuration
+  template: src={{IP_CONF}} dest=/etc/sysconfig/network-scripts/{{IP_CONF}}
+
+- name: close selinux
+  selinux: state=disabled
+  
+- name: stop firewalld
+  service: name=firewalld state=stopped enabled=false
+  
+- name: modify open files
+  template: src=limits.conf dest=/etc/security/limits.conf 
+
+- name: swap off 
+  shell: swapoff -a  
+
+- name: delete swap from fstab
+  mount: state=absent src=/dev/mapper/centos-swap path=swap
+
+- name: update ali yum repo
+  template: src=CentOS-Base.repo dest=/etc/yum.repos.d/CentOS-Base.repo
+
+- name: update ali k8s repo
+  template: src=k8s.repo dest=/etc/yum.repos.d/k8s.repo
