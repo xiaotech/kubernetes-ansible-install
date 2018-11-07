@@ -1,0 +1,9 @@
+apiVersion: kubeadm.k8s.io/v1alpha1
+kind: MasterConfiguration
+api:
+  advertiseAddress: "{{MASTER_IP}}"
+networking:
+  podSubnet: "{{POD_NET}}"
+  serviceSubnet: 10.96.0.0/16
+kubernetesVersion: "{{KUBERNETES_VERSION}}"
+imageRepository: "{{INSECURE_REGISTRY}}/k8s"

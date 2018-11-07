@@ -2,7 +2,8 @@
   hostname: name={{NODE_NAME}}
 
 - name: set ip configuration
-  template: src={{IP_CONF}} dest=/etc/sysconfig/network-scripts/{{IP_CONF}}
+  template: src=centos7-interface dest=/etc/sysconfig/network-scripts/ifcfg-{{INTERFACE}}
+  when: MODIFY_IP_ENABLE
 
 - name: close selinux
   selinux: state=disabled
@@ -24,3 +25,33 @@
 
 - name: update ali k8s repo
   template: src=k8s.repo dest=/etc/yum.repos.d/k8s.repo
+
+- name: install docker
+  yum: name=docker state=present
+
+- name: add insecure registry
+  template: src=daemon.json dest=/etc/docker/daemon.json
+  when: INSECURE_REGISTRY_ENABLE
+
+- name: restart docker
+  service: name=docker state=restarted
+  when: INSECURE_REGISTRY_ENABLE
+
+- name: enable docker start
+  service: name=docker state=started enabled=true
+
+- name: install kubelet
+  yum: name=kubelet-{{KUBERNETES_VERSION}} state=present
+
+- name: install kubeadm
+  yum: name=kubeadm-{{KUBERNETES_VERSION}} state=present
+
+- name: custom kubelet config
+  template: src=10-kubeadm.conf dest=/etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+
+- name: custom kubelet config
+  template: src=10-kubeadm.conf_insecure dest=/etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+  when: INSECURE_REGISTRY_ENABLE
+
+- name: enable kubelet
+  service: name=kubelet enabled=true

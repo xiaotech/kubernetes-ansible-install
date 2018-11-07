@@ -1,26 +1,12 @@
-- name: install docker
-  yum: name=docker state=present  
-
-- name: enable docker start
-  service: name=docker state=started enabled=true
-
-- name: install kubelet
-  yum: name=kubelet-{{KUBERNETES_VERSION}} state=present
-
-- name: install kubeadm
-  yum: name=kubeadm-{{KUBERNETES_VERSION}} state=present
-
-- name: custom kubelet config
-  template: src=10-kubeadm.conf dest=/etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-
-- name: enable kubelet
-  service: name=kubelet enabled=true
-
 - name: create kubernetes config dir
   file: path=/etc/kubernetes state=directory
 
+- name: reset cluster
+  shell: kubeadm reset
+
 - name: init admin conf
   copy: src={{ADMIN_CONF}} dest=/etc/kubernetes/admin.conf
+
 
 - name: get kubeadm token
   shell: kubeadm token list | grep -v TOKEN| awk '{print $1}'

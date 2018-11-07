@@ -1,23 +1,12 @@
-- name: install docker
-  yum: name=docker state=present  
-
-- name: enable docker start
-  service: name=docker state=started enabled=true
-
-- name: install kubelet
-  yum: name=kubelet-{{KUBERNETES_VERSION}} state=present
-
-- name: install kubeadm
-  yum: name=kubeadm-{{KUBERNETES_VERSION}} state=present
-
-- name: custom kubelet config
-  template: src=10-kubeadm.conf dest=/etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-
-- name: enable kubelet
-  service: name=kubelet enabled=true
-
 - name: init master config
   template: src=kubeadm.conf dest=/home/kubeadm.conf
+
+- name: init master insecure config
+  template: src=kubeadm.conf_insecure dest=/home/kubeadm.conf
+  when: INSECURE_REGISTRY_ENABLE
+
+- name: reset master
+  shell: kubeadm reset
 
 - name: install master
   shell: kubeadm init --config /home/kubeadm.conf
@@ -33,6 +22,10 @@
 
 - name: init flannel conf
   template: src=kube-flannel.yaml dest=/etc/kubernetes/kube-flannel.yaml
+
+- name: init flannel conf
+  template: src=kube-flannel.yaml_insecure dest=/etc/kubernetes/kube-flannel.yaml
+  when: INSECURE_REGISTRY_ENABLE
 
 - name: create flannel network
   shell: kubectl create -f /etc/kubernetes/kube-flannel.yaml
