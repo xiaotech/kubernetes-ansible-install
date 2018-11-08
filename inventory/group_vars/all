@@ -7,11 +7,11 @@ POD_NET: 10.254.0.0/16   # 容器网络
 MASTER_IP: 172.30.81.192  # master主机的ip
 ADMIN_CONF: /tmp/admin.conf  # 配置文件保存位置
 
-MODIFY_IP_ENABLE: true
+MODIFY_IP_ENABLE: true  # 是否修改网卡的配置文件
 INTERFACE: ens3    # 网卡名字
 NETMASK: 255.255.255.0 # k8s主机的子网
 GATEWAY: 172.30.81.1   # k8s主机的网关
 DNS1: 202.96.209.133   # k8s主机的dns服务器1
 DNS2: 202.96.199.133   # k8s主机的dns服务器2
 
-NETWORK_TYPE: calico
+NETWORK_TYPE: calico  #calico或者flannel
