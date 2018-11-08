@@ -22,10 +22,24 @@
 
 - name: init flannel conf
   template: src=kube-flannel.yaml dest=/etc/kubernetes/kube-flannel.yaml
+  when: NETWORK_TYPE == "flannel"
 
-- name: init flannel conf
+- name: init calico conf
+  template: src=kube-calico.yaml dest=/etc/kubernetes/kube-calico.yaml
+  when: NETWORK_TYPE == "calico"
+
+- name: init flannel_insecure conf
   template: src=kube-flannel.yaml_insecure dest=/etc/kubernetes/kube-flannel.yaml
-  when: INSECURE_REGISTRY_ENABLE
+  when: INSECURE_REGISTRY_ENABLE and NETWORK_TYPE == "flannel" 
+
+- name: init calico_insecure conf
+  template: src=kube-calico_insecure.yaml dest=/etc/kubernetes/kube-calico.yaml
+  when: INSECURE_REGISTRY_ENABLE and NETWORK_TYPE == "calico" 
 
 - name: create flannel network
   shell: kubectl create -f /etc/kubernetes/kube-flannel.yaml
+  when: NETWORK_TYPE == "flannel"
+
+- name: create calico network
+  shell: kubectl create -f /etc/kubernetes/kube-calico.yaml
+  when: NETWORK_TYPE == "calico"
